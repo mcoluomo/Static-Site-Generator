@@ -2,8 +2,8 @@
 
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
-        self.tag: str = tag
-        self.value: str = value
+        self.tag: str | None= tag
+        self.value: str | None= value
         self.children: list = children or []
         self.props: dict = props or {}
         
@@ -28,7 +28,6 @@ class LeafNode(HTMLNode):
     def __init__(self, tag=None, value=None, props=None):
         super().__init__(tag, value, None, props)
 
-
     def to_html(self):
         if not self.value:
             raise ValueError("No value was given")
@@ -39,11 +38,10 @@ class LeafNode(HTMLNode):
 
         return f"<{self.tag}{props_string}>{self.value}</{self.tag}>"
     
-
+    
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
         super().__init__(tag, None, children, props)
-
 
     def to_html(self):
         if not self.tag:
