@@ -41,7 +41,7 @@ class TestTextNode(unittest.TestCase):
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, None)
         self.assertEqual(html_node.value, "This is a text node")
-        
+
     def test_text_node_to_html_node_text(self):
         node = TextNode("This is a text node", TextType.TEXT)
         html_node = text_node_to_html_node(node)
@@ -87,6 +87,7 @@ class TestTextNode(unittest.TestCase):
         # Create an invalid TextNode with undefined text_type
         with self.assertRaises(ValueError):
             text_node_to_html_node("invalid node")
+
 
 if __name__ == "__main__":
     unittest.main()

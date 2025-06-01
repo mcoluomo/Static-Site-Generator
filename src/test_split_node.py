@@ -5,6 +5,7 @@ from split_node import (
     extracted_link,
     split_nodes_delimiter,
     split_nodes_image,
+    split_nodes_link,
 )
 from textnode import TextNode, TextType
 
@@ -157,6 +158,274 @@ class TestSplitNodesImagesAndLinks(unittest.TestCase):
                 ),
             ],
             new_nodes,
+        )
+
+    def test_split_images_no_image(self):
+        node = TextNode("Just text", TextType.TEXT)
+        self.assertListEqual(split_nodes_image([node]), [node])
+
+    def test_split_images_single_image_surrounded(self):
+        node = TextNode("Start ![alt](url) end", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("Start ", TextType.TEXT),
+                TextNode("alt", TextType.IMAGE, "url"),
+                TextNode(" end", TextType.TEXT),
+            ],
+        )
+
+    def test_split_images_image_at_start(self):
+        node = TextNode("![alt](url) after", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("alt", TextType.IMAGE, "url"),
+                TextNode(" after", TextType.TEXT),
+            ],
+        )
+
+    def test_split_images_image_at_end(self):
+        node = TextNode("before ![alt](url)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("before ", TextType.TEXT),
+                TextNode("alt", TextType.IMAGE, "url"),
+            ],
+        )
+
+    def test_split_images_only_image(self):
+        node = TextNode("![alt](url)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("alt", TextType.IMAGE, "url"),
+            ],
+        )
+
+    def test_split_images_multiple_images(self):
+        node = TextNode("A ![a](1) B ![b](2) C", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("A ", TextType.TEXT),
+                TextNode("a", TextType.IMAGE, "1"),
+                TextNode(" B ", TextType.TEXT),
+                TextNode("b", TextType.IMAGE, "2"),
+                TextNode(" C", TextType.TEXT),
+            ],
+        )
+
+    def test_split_images_empty_alt(self):
+        node = TextNode("![ ](url)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode(" ", TextType.IMAGE, "url"),
+            ],
+        )
+
+    def test_split_images_empty_url(self):
+        node = TextNode("![alt]()", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("alt", TextType.IMAGE, ""),
+            ],
+        )
+
+    def test_split_images_adjacent_images(self):
+        node = TextNode("![a](1)![b](2)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("a", TextType.IMAGE, "1"),
+                TextNode("b", TextType.IMAGE, "2"),
+            ],
+        )
+
+    def test_split_images_special_characters(self):
+        node = TextNode("![a!@#](u!@#)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("a!@#", TextType.IMAGE, "u!@#"),
+            ],
+        )
+
+    def test_split_images_malformed_image(self):
+        node = TextNode("![alt](url", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [TextNode("![alt](url", TextType.TEXT)],
+        )
+
+    def test_split_images_empty_string(self):
+        node = TextNode("", TextType.TEXT)
+        self.assertListEqual(split_nodes_image([node]), [])
+
+    def test_split_images_whitespace(self):
+        node = TextNode("   ", TextType.TEXT)
+        self.assertListEqual(split_nodes_image([node]), [])
+
+    def test_split_images_with_whitespace(self):
+        node = TextNode("   ![alt](url)    ", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("alt", TextType.IMAGE, "url"),
+            ],
+        )
+
+    def test_split_images_text_and_image_with_whitespace(self):
+        node = TextNode("   before ![alt](url) after   ", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_image([node]),
+            [
+                TextNode("   before ", TextType.TEXT),
+                TextNode("alt", TextType.IMAGE, "url"),
+                TextNode(" after   ", TextType.TEXT),
+            ],
+        )
+
+    def test_split_links_no_link(self):
+        node = TextNode("Just text", TextType.TEXT)
+        self.assertListEqual(split_nodes_link([node]), [node])
+
+    def test_split_links_single_link_surrounded(self):
+        node = TextNode("Start [alt](url) end", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("Start ", TextType.TEXT),
+                TextNode("alt", TextType.LINK, "url"),
+                TextNode(" end", TextType.TEXT),
+            ],
+        )
+
+    def test_split_links_link_at_start(self):
+        node = TextNode("[alt](url) after", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("alt", TextType.LINK, "url"),
+                TextNode(" after", TextType.TEXT),
+            ],
+        )
+
+    def test_split_links_link_at_end(self):
+        node = TextNode("before [title](url)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("before ", TextType.TEXT),
+                TextNode("title", TextType.LINK, "url"),
+            ],
+        )
+
+    def test_split_links_only_link(self):
+        node = TextNode("[alt](url)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("alt", TextType.LINK, "url"),
+            ],
+        )
+
+    def test_split_links_multiple_links(self):
+        node = TextNode("A [a](1) B [b](2) C", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("A ", TextType.TEXT),
+                TextNode("a", TextType.LINK, "1"),
+                TextNode(" B ", TextType.TEXT),
+                TextNode("b", TextType.LINK, "2"),
+                TextNode(" C", TextType.TEXT),
+            ],
+        )
+
+    def test_split_links_empty_alt(self):
+        node = TextNode("[](url)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("", TextType.LINK, "url"),
+            ],
+        )
+
+    def test_split_links_empty_url(self):
+        node = TextNode("[alt]()", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("alt", TextType.LINK, ""),
+            ],
+        )
+
+    def test_split_links_adjacent_links(self):
+        node = TextNode("[a](1)[b](2)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("a", TextType.LINK, "1"),
+                TextNode("b", TextType.LINK, "2"),
+            ],
+        )
+
+    def test_split_links_special_characters(self):
+        node = TextNode("[a!@#](u!@#)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("a!@#", TextType.LINK, "u!@#"),
+            ],
+        )
+
+    def test_split_links_malformed_link(self):
+        node = TextNode("[alt](url", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [TextNode("[alt](url", TextType.TEXT)],
+        )
+
+    def test_split_links_image_not_link(self):
+        node = TextNode("![alt](img.png) and [real](url)", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("![alt](img.png) and ", TextType.TEXT),
+                TextNode("real", TextType.LINK, "url"),
+            ],
+        )
+
+    def test_split_links_empty_string(self):
+        node = TextNode("", TextType.TEXT)
+        self.assertListEqual(split_nodes_link([node]), [])
+
+    def test_split_links_whitespace(self):
+        node = TextNode("   ", TextType.TEXT)
+        self.assertListEqual(split_nodes_link([node]), [])
+
+    def test_split_links_with_whitespace(self):
+        node = TextNode("   [alt](url)     ", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("alt", TextType.LINK, "url"),
+            ],
+        )
+
+    def test_split_links_text_and_link_with_whitespace(self):
+        node = TextNode("   before [alt](url) after   ", TextType.TEXT)
+        self.assertListEqual(
+            split_nodes_link([node]),
+            [
+                TextNode("   before ", TextType.TEXT),
+                TextNode("alt", TextType.LINK, "url"),
+                TextNode(" after   ", TextType.TEXT),
+            ],
         )
 
 
