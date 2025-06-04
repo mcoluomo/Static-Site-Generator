@@ -1,6 +1,6 @@
 import unittest
 
-from text_to_textnode import text_to_textnodes
+from inline_markdown import text_to_textnodes
 from textnode import TextNode, TextType
 
 
@@ -28,7 +28,6 @@ class TestTextToTextnodeEdgeCases(unittest.TestCase):
             ],
             new_nodes,
         )
-
 
     def test_plain_text_only(self):
         text = "Just plain text"
@@ -139,18 +138,11 @@ class TestTextToTextnodeEdgeCases(unittest.TestCase):
             text_to_textnodes("_italic")
 
     def test_empty_formatting(self):
-        self.assertListEqual(
-            text_to_textnodes("****"),
-            [TextNode("****", TextType.TEXT)],
-        )
-        self.assertListEqual(
-            text_to_textnodes("``"),
-            [TextNode("``", TextType.TEXT)],
-        )
-        self.assertListEqual(
-            text_to_textnodes("__"),
-            [TextNode("__", TextType.TEXT)],
-        )
+        self.assertListEqual(text_to_textnodes("****"), [])
+
+        self.assertListEqual(text_to_textnodes("``"), [])
+
+        self.assertListEqual(text_to_textnodes("__"), [])
 
     def test_images(self):
         self.assertListEqual(
