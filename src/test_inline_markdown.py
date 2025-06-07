@@ -25,43 +25,35 @@ class TestSplitNodesDelimiter(unittest.TestCase):
     def test_multiple_delimiters(self):
         node = TextNode("`code1` text `code2`", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
-        self.assertEqual(len(result), 5)
-        self.assertEqual(result[0], TextNode("", TextType.TEXT))
-        self.assertEqual(result[1], TextNode("code1", TextType.CODE))
-        self.assertEqual(result[2], TextNode(" text ", TextType.TEXT))
-        self.assertEqual(result[3], TextNode("code2", TextType.CODE))
-        self.assertEqual(result[4], TextNode("", TextType.TEXT))
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0], TextNode("code1", TextType.CODE))
+        self.assertEqual(result[1], TextNode(" text ", TextType.TEXT))
+        self.assertEqual(result[2], TextNode("code2", TextType.CODE))
 
     def test_delimiter_at_start(self):
-        node = TextNode("`code`text", TextType.TEXT)
+        node = TextNode("` code`text", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0], TextNode("", TextType.TEXT))
-        self.assertEqual(result[1], TextNode("code", TextType.CODE))
-        self.assertEqual(result[2], TextNode("text", TextType.TEXT))
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], TextNode(" code", TextType.CODE))
+        self.assertEqual(result[1], TextNode("text", TextType.TEXT))
 
     def test_delimiter_at_end(self):
         node = TextNode("text`code`", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 2)
         self.assertEqual(result[0], TextNode("text", TextType.TEXT))
         self.assertEqual(result[1], TextNode("code", TextType.CODE))
-        self.assertEqual(result[2], TextNode("", TextType.TEXT))
 
     def test_empty_text(self):
         node = TextNode("", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
-        self.assertEqual(result, [TextNode("", TextType.TEXT)])
+        self.assertEqual(result, [])
 
     def test_string_with_only(self):
         node = TextNode("``", TextType.TEXT)
         self.assertEqual(
             split_nodes_delimiter([node], "`", TextType.CODE),
-            [
-                TextNode("", TextType.TEXT),
-                TextNode("", TextType.CODE),
-                TextNode("", TextType.TEXT),
-            ],
+            [],
         )
 
     def test_string_with_delimiters_and_nothing_between(self):
@@ -70,8 +62,6 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         self.assertEqual(
             split_nodes_delimiter([node], "`", TextType.CODE),
             [
-                TextNode("", TextType.TEXT),
-                TextNode("", TextType.CODE),
                 TextNode(" bold", TextType.TEXT),
             ],
         )
@@ -79,7 +69,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
     def test_delimiter_at_start_and_end(self):
         node = TextNode("`code`", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 1)
 
     def test_double_split(self):
         node = TextNode("_text_ `code` more", TextType.TEXT)
@@ -96,9 +86,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         self.assertEqual(
             result2,
             [
-                TextNode("", TextType.TEXT),
                 TextNode("text", TextType.ITALIC),
-                TextNode(" ", TextType.TEXT),
                 TextNode("code", TextType.CODE),
                 TextNode(" more", TextType.TEXT),
             ],

@@ -4,42 +4,13 @@ from textnode import TextNode, TextType
 
 
 def text_to_textnodes(text):
-    delimiters_in_text = [
-        delimiter for delimiter in ["**", "_", "`"] if delimiter in text
-    ]
-    previous_nodes = [TextNode(text, TextType.TEXT)]
-    delimiter_texttype = {
-        "**": TextType.BOLD,
-        "_": TextType.ITALIC,
-        "`": TextType.CODE,
-    }
-
-    while True:
-        nodes_before = previous_nodes.copy()
-
-        current_nodes = split_nodes_image(previous_nodes)
-        if current_nodes != previous_nodes:
-            previous_nodes = current_nodes
-
-        current_nodes = split_nodes_link(previous_nodes)
-        if current_nodes != previous_nodes:
-            previous_nodes = current_nodes
-
-        if not delimiters_in_text:
-            break
-        for delimiter in delimiters_in_text:
-            current_nodes = split_nodes_delimiter(
-                previous_nodes,
-                delimiter,
-                delimiter_texttype[delimiter],
-            )
-            if current_nodes != previous_nodes:
-                previous_nodes = current_nodes
-
-        if previous_nodes == nodes_before:
-            break
-
-    return previous_nodes
+    nodes = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    return nodes
 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -57,6 +28,9 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             raise ValueError(msg)
 
         for index, section in enumerate(split_node_text):
+            if section.strip() == "":
+                continue
+
             if index % 2 == 0:
                 split_nodes.append(
                     TextNode(section, TextType.TEXT),

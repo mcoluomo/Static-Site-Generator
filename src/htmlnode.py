@@ -47,9 +47,6 @@ class ParentNode(HTMLNode):
         if not self.tag:
             msg = "No tag attribute was given"
             raise ValueError(msg)
-        if not self.children:
-            msg = "No children attribute was given"
-            raise ValueError(msg)
 
         html_node = ""
         for node in self.children:
