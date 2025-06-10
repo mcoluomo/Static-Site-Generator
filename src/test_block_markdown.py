@@ -6,7 +6,6 @@ from block_markdown import (
     markdown_to_blocks,
     markdown_to_html_node,
 )
-from htmlnode import *
 
 
 class TestBloclMarkdown(unittest.TestCase):

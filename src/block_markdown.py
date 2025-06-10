@@ -36,7 +36,6 @@ def markdown_to_html_node(markdown):
     return ParentNode("div", block_nodes_children)
 
 
-# returns list of html (leafnodes) nodes currently from block text
 def text_to_children(text):
     block_type = block_to_block_type(text)
 

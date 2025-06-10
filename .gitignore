@@ -1,3 +1,6 @@
 venv/
 __pycache__/
-.vscode
+.vscode/
+.ruff_cache/
+public/
+# Ignore Python bytecode files

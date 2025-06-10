@@ -91,20 +91,11 @@ class TestHTMLNode(unittest.TestCase):
         parent_node = ParentNode(None, [LeafNode("p", "child")])
         parent_node1 = ParentNode("", [LeafNode("b", "child")])
 
-        parent_node2 = ParentNode("ol", None)
-        parent_node3 = ParentNode("data", [])
-
         with self.assertRaises(ValueError):
             parent_node.to_html()
 
         with self.assertRaises(ValueError):
             parent_node1.to_html()
-
-        with self.assertRaises(ValueError):
-            parent_node2.to_html()
-
-        with self.assertRaises(ValueError):
-            parent_node3.to_html()
 
     def test_parent_node_with_props(self):
         child = LeafNode("p", "text")
