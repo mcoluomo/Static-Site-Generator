@@ -264,6 +264,26 @@ Second block
             "<div><p>This is <b>bold</b> and <i>italic</i> and <code>code</code>.</p></div>",
         )
 
+    def test_disney_paragraph(self):
+        md = "Disney **didn't ruin it** (okay, but Amazon might have)"
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>Disney <b>didn't ruin it</b> (okay, but Amazon might have)</p></div>",
+        )
+
+    def test_disney_list(self):
+        md = "- Disney **didn't ruin it** (okay, but Amazon might have)"
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ul><li>Disney <i>didn't ruin it</i> (okay, but Amazon might have)</li></ul></div>",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

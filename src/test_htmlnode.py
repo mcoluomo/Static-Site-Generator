@@ -89,7 +89,7 @@ class TestHTMLNode(unittest.TestCase):
 
     def test_to_html_value_errors(self):
         parent_node = ParentNode(None, [LeafNode("p", "child")])
-        parent_node1 = ParentNode("", [LeafNode("b", "child")])
+        parent_node1 = ParentNode("", [LeafNode("b")])
 
         with self.assertRaises(ValueError):
             parent_node.to_html()

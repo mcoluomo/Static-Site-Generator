@@ -35,7 +35,7 @@ class TextNode:
 def text_node_to_html_node(text_node):
     match text_node:
         case TextNode(text=text, text_type=TextType.TEXT):
-            return LeafNode(value=text)
+            return LeafNode(None, value=text)
         case TextNode(text=text, text_type=TextType.BOLD):
             return LeafNode("b", text)
         case TextNode(text=text, text_type=TextType.ITALIC):
@@ -43,9 +43,9 @@ def text_node_to_html_node(text_node):
         case TextNode(text=text, text_type=TextType.CODE):
             return LeafNode("code", text)
         case TextNode(text=text, text_type=TextType.LINK, url=url):
-            return LeafNode("a", text, {"href": url})
+            return LeafNode(tag="a", value=text, props={"href": url})
         case TextNode(text=text, text_type=TextType.IMAGE, url=url):
-            return LeafNode(tag="img", props={"src": url, "alt": text})
+            return LeafNode(tag="img", value="", props={"src": url, "alt": text})
         case _:
             msg = "invalid node. Perhaps the wrong TextType was given"
             raise ValueError(msg)

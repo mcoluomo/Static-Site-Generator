@@ -18,7 +18,7 @@ def copy_static_to_public():
     for item in src_path.iterdir():
         helper_copy_directory(item, dest_path / item.name)
 
-    print(f" * {src_path} -> {dest_path}")
+    print(f"* {src_path} -> {dest_path}")
 
 
 def helper_copy_directory(src_item, dest_item):
@@ -47,8 +47,6 @@ def extract_title(markdown):
 
 
 def generate_page(from_path, template_path, dest_path):
-    print("* Generating page from from_path to dest_path using template_path")
-
     markdown = Path(from_path).read_text()
 
     html_template = Path(template_path).read_text()
@@ -57,11 +55,13 @@ def generate_page(from_path, template_path, dest_path):
     html_content = markdown_as_html_nodes.to_html()
     extracted_title = extract_title(from_path)
 
-    html = html_template.replace("{{ Title }}", extracted_title).replace(
+    html = html_template.replace("{{ Title }}", extracted_title, 1).replace(
         "{{ Content }}",
         html_content,
+        1,
     )
 
-    dest_path.parent.mkdir(parents=True, exist_ok=True)
+    Path(dest_path).parent.mkdir(parents=True, exist_ok=True)
 
-    dest_path.write_text(html, encoding="utf-8")
+    Path(dest_path).write_text(html, encoding="utf-8")
+    print(f"* Generating page from {from_path} to {dest_path} using {template_path}")
