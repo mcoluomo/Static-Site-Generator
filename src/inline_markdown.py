@@ -4,7 +4,7 @@ from textnode import TextNode, TextType
 
 
 def text_to_textnodes(text):
-    nodes = [TextNode(text, TextType.TEXT)]
+    nodes = [TextNode(txt, TextType.TEXT) for txt in text.split("\n") if txt.strip()]
     nodes = split_nodes_image(nodes)
     nodes = split_nodes_link(nodes)
     nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)

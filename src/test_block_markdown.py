@@ -265,23 +265,41 @@ Second block
         )
 
     def test_disney_paragraph(self):
-        md = "Disney **didn't ruin it** (okay, but Amazon might have)"
+        md = "Disney _didn't ruin it_ (okay, but Amazon might have)"
 
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
             html,
-            "<div><p>Disney <b>didn't ruin it</b> (okay, but Amazon might have)</p></div>",
+            "<div><p>Disney <i>didn't ruin it</i> (okay, but Amazon might have)</p></div>",
         )
 
     def test_disney_list(self):
-        md = "- Disney **didn't ruin it** (okay, but Amazon might have)"
+        md = "- Disney _didn't ruin it_ (okay, but Amazon might have)"
 
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
             html,
             "<div><ul><li>Disney <i>didn't ruin it</i> (okay, but Amazon might have)</li></ul></div>",
+        )
+
+    def test_single_unordered_list_item(self):
+        md = "- It can be enjoyed by children and adults alike"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ul><li>It can be enjoyed by children and adults alike</li></ul></div>",
+        )
+
+    def test_blockquote_multiline(self):
+        md = '> "I am in fact a Hobbit in all but size."\n>\n> -- J.R.R. Tolkien'
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            '<div><blockquote>"I am in fact a Hobbit in all but size."<br>-- J.R.R. Tolkien</blockquote></div>',
         )
 
 

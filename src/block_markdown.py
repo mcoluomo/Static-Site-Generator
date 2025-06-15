@@ -41,24 +41,54 @@ def text_to_children(text):
 
     match block_type:
         case BlockType.QUOTE:
-            split_text = re.sub(r"\n?>\s", "\n", text).split("\n")
-            cleaned_split_text = [s.strip() for s in split_text if s.strip()]
+            split_text = text.split("\n")
+            cleaned_split_text = []
+            for txt in split_text:
+                modified_txt = txt
+                if modified_txt.startswith("> "):
+                    modified_txt = modified_txt.removeprefix("> ")
+                if modified_txt == ">":
+                    modified_txt = "<br>"
+                if modified_txt.strip():
+                    cleaned_split_text.append(modified_txt.strip())
             list_leaf_nodes = [LeafNode(value=text) for text in cleaned_split_text]
             return ParentNode("blockquote", list_leaf_nodes)
 
         case BlockType.OLIST:
-            split_text = re.split(r"\n?[1-9]\d*\.\s", text)
-            cleaned_split_text = [s.strip() for s in split_text if s.strip()]
+            text_nodes = text_to_textnodes(text)
+            html_nodes = list(map(text_node_to_html_node, text_nodes))
 
-            list_leaf_nodes = [LeafNode("li", text) for text in cleaned_split_text]
-            return ParentNode("ol", list_leaf_nodes)
+            list_html_nodes = []
+            for node in html_nodes:
+                if node.value is not None and re.search(r"^[0-9]+\.\s", node.value):
+                    list_html_nodes.append(
+                        ParentNode(
+                            "li",
+                            [LeafNode(value=re.sub(r"^[0-9]+\.\s", "", node.value))],
+                        ),
+                    )
+                else:
+                    list_html_nodes[-1].children.append(node)
+
+            return ParentNode("ol", list_html_nodes)
 
         case BlockType.ULIST:
-            split_text = re.sub(r"\n?-\s", "\n", text).split("\n")
-            cleaned_split_text = [s.strip() for s in split_text if s.strip()]
-            list_leaf_nodes = [LeafNode("li", text) for text in cleaned_split_text]
+            text_nodes = text_to_textnodes(text)
+            html_nodes = list(map(text_node_to_html_node, text_nodes))
 
-            return ParentNode("ul", list_leaf_nodes)
+            list_html_nodes = []
+            for node in html_nodes:
+                if node.value is not None and node.value.startswith("- "):
+                    list_html_nodes.append(
+                        ParentNode(
+                            "li",
+                            [LeafNode(value=node.value.removeprefix("- "))],
+                        ),
+                    )
+                else:
+                    list_html_nodes[-1].children.append(node)
+
+            return ParentNode("ul", list_html_nodes)
 
         case BlockType.HEADING:
             split_text = re.sub(r"\n?#+\s", "\n", text).split("\n")

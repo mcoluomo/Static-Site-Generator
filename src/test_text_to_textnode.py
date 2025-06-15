@@ -278,9 +278,9 @@ class TestTextToTextnodeEdgeCases(unittest.TestCase):
         self.assertListEqual(
             text_to_textnodes("Line 1\n**bold**\nLine 3"),
             [
-                TextNode("Line 1\n", TextType.TEXT),
+                TextNode("Line 1", TextType.TEXT),
                 TextNode("bold", TextType.BOLD),
-                TextNode("\nLine 3", TextType.TEXT),
+                TextNode("Line 3", TextType.TEXT),
             ],
         )
 
