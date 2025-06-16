@@ -1,4 +1,5 @@
 import shutil
+from logging import INFO, basicConfig, getLogger
 from pathlib import Path
 
 from block_markdown import markdown_to_html_node
@@ -65,3 +66,26 @@ def generate_page(from_path, template_path, dest_path):
 
     Path(dest_path).write_text(html, encoding="utf-8")
     print(f"* Generating page from {from_path} to {dest_path} using {template_path}")
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    basicConfig(level=INFO)
+    logger = getLogger(__name__)
+
+    current_item = Path(dir_path_content)
+    if current_item.is_file() and current_item.suffix == ".md":
+        try:
+            logger.info("Generate a page")
+
+            generate_page(current_item, template_path, f"{dest_dir_path}/index.html")
+        except OSError as e:
+            err_msg = f"An OS error occurred: {e}"
+            logger.exception(err_msg)
+
+    elif current_item.is_dir():
+        for child in current_item.iterdir():
+            generate_pages_recursive(
+                child,
+                template_path,
+                Path(current_item) / child.name,
+            )

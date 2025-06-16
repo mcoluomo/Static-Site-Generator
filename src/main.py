@@ -1,6 +1,9 @@
 from logging import INFO, basicConfig, getLogger
 
-from generate_website import copy_static_to_public, generate_page
+from generate_website import (
+    copy_static_to_public,
+    generate_pages_recursive,
+)
 
 
 def main():
@@ -16,11 +19,9 @@ def main():
         logger.exception(err_msg)
 
     try:
-        logger.info(
-            "Generate a page from content/index.md to public/index.html using template.html",
-        )
-        generate_page("content/index.md", "template.html", "public/index.html")
-        logger.info("Generating Static site successfully")
+        logger.info("Generate a pages from content recursively")
+        generate_pages_recursive("content", "template.html", "public")
+        logger.info("Generating Static sites successfully")
     except OSError as e:
         err_msg = f"An OS error occurred: {e}"
         logger.exception(err_msg)
