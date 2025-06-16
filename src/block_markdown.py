@@ -1,4 +1,5 @@
 import re
+import textwrap
 from enum import Enum
 
 from htmlnode import LeafNode, ParentNode
@@ -23,7 +24,7 @@ def markdown_to_html_node(markdown):
 
         if block_type == BlockType.CODE:
             text = block.removeprefix("```").removesuffix("```")
-            cleaned_text = re.sub(r"\n\s+", "\n", text).removeprefix("\n")
+            cleaned_text = textwrap.dedent(text.removeprefix("\n"))
             child_node = text_node_to_html_node(TextNode(cleaned_text, TextType.CODE))
             block_nodes_children.append(ParentNode("pre", [child_node]))
         else:
@@ -91,12 +92,25 @@ def text_to_children(text):
             return ParentNode("ul", list_html_nodes)
 
         case BlockType.HEADING:
-            split_text = re.sub(r"\n?#+\s", "\n", text).split("\n")
+            text_nodes = text_to_textnodes(text)
+            html_nodes = list(map(text_node_to_html_node, text_nodes))
 
-            cleaned_split_text = [s.strip() for s in split_text if s.strip()]
-            matches = re.findall(r"^\n?#+", text)
+            # cleaned_split_text = [s.strip() for s in split_text if s.strip()]
+            matches = re.findall(r"^#+", text)
             tag_type = len("".join(matches))
-            return [LeafNode(f"h{tag_type}", text) for text in cleaned_split_text]
+
+            list_html_nodes = []
+            for node in html_nodes:
+                if node.value is not None and node.value.startswith(
+                    ("# ", "## ", "### ", "#### ", "##### ", "###### "),
+                ):
+                    list_html_nodes.append(
+                        LeafNode(value=re.sub(r"^#+\s", "", node.value)),
+                    )
+                else:
+                    list_html_nodes.append(node)
+
+            return ParentNode(f"h{tag_type}", list_html_nodes)
 
         case _:
             new_text_block = " ".join(text.replace("\n", "").split())
@@ -108,14 +122,7 @@ def text_to_children(text):
 def block_to_block_type(block_of_markdown):
     match block_of_markdown:
         case s if s.startswith(
-            (
-                "# ",
-                "## ",
-                "### ",
-                "#### ",
-                "##### ",
-                "###### ",
-            ),
+            ("# ", "## ", "### ", "#### ", "##### ", "###### "),
         ):
             return BlockType.HEADING
         case s if s.startswith("```") and s.endswith("```"):

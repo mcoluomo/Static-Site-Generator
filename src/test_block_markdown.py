@@ -8,7 +8,7 @@ from block_markdown import (
 )
 
 
-class TestBloclMarkdown(unittest.TestCase):
+class TestBlockMarkdown(unittest.TestCase):
     def test_markdown_to_blocks(self):
         md = """
 This is **bolded** paragraph
@@ -300,6 +300,30 @@ Second block
         self.assertEqual(
             html,
             '<div><blockquote>"I am in fact a Hobbit in all but size."<br>-- J.R.R. Tolkien</blockquote></div>',
+        )
+
+    def test_heading_with_bold_inline(self):
+        md = "## Themes of **Enduring** Legacy"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><h2>Themes of <b>Enduring</b> Legacy</h2></div>",
+        )
+
+    def test_codeblock_with_language_and_braces(self):
+        md = """
+        ```
+        func main(){
+            fmt.Println(\"Aiya, Ambar!\")
+        }
+        ```
+        """
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            '<div><pre><code>func main(){\n    fmt.Println("Aiya, Ambar!")\n}\n</code></pre></div>',
         )
 
 

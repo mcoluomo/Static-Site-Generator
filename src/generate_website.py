@@ -65,3 +65,7 @@ def generate_page(from_path, template_path, dest_path):
 
     Path(dest_path).write_text(html, encoding="utf-8")
     print(f"* Generating page from {from_path} to {dest_path} using {template_path}")
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    pass
